@@ -1,9 +1,21 @@
-# DHT sensor library [![Build Status](https://github.com/adafruit/DHT-sensor-library/workflows/Arduino%20Library%20CI/badge.svg)](https://github.com/adafruit/DHT-sensor-library/actions)
+# Climate Control Project
 
 ## Description
+This is a project that let's me control the temperature in my home office. I use the [DHT-sensor-library](https://github.com/adafruit/DHT-sensor-library) and AM2302 sensor to measure the temperature. I then use an Arduino Uno board and relay to control an electric heater. The goal of this project is to use Blynk and an ESP8266 board to be able monitor the current temperature and set the desired temperature with a mobile application.
 
+# Dependencies
+ * [Adafruit Unified Sensor Driver](https://github.com/adafruit/Adafruit_Sensor)
+
+ # Necessary Drivers
+
+
+# Parent Repository
+https://github.com/adafruit/DHT-sensor-library
+
+
+
+# Parent Repository Description
 An Arduino library for the DHT series of low-cost temperature/humidity sensors.
-
 You can find DHT tutorials [here](https://learn.adafruit.com/dht).
 
 # Dependencies
