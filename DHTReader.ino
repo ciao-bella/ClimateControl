@@ -32,11 +32,13 @@
 // as the current DHT reading algorithm adjusts itself to work on faster procs.
 DHT dht(DHTPIN, DHTTYPE);
 
+
+
 void setup() {
-  if(DEBUG) {
+  #if DEBUG 
       Serial.begin(9600);
       Serial.println(F("DHTxx test!"));
-  }
+  #endif
 
   //Begin reading 40-bit stream from AM2302
   dht.begin();
@@ -55,16 +57,16 @@ void loop() {
 
   // Check if any reads failed and exit early (to try again).
   if ( isnan(t) || isnan(h) ) {
-    if(DEBUG) {
-      Serial.println(F("Failed to read from DHT sensor!"));
-    }
+      #if DEBUG 
+        Serial.println(F("Failed to read from DHT sensor!"));
+      #endif
     return;
   }
 
 //   Compute heat index in Celsius (isFahreheit = false)
   float hic = dht.computeHeatIndex(t, h, false);
 
-  if(DEBUG) {
+  #if DEBUG 
       Serial.print(F("Humidity: "));
       Serial.print(h);
       Serial.print(F("%  Temperature: "));
@@ -74,6 +76,6 @@ void loop() {
       Serial.print(hic);
       Serial.print(F("°C "));
       Serial.println();
-  }
+  #endif
 
 }
