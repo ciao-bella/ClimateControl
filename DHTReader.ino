@@ -7,11 +7,14 @@
 
 #include "DHT.h"
 
+#define RELAYPIN 8 //control the relay to heating source with this pin
 #define DHTPIN 2     // Digital pin connected to the DHT sensor
 // Feather HUZZAH ESP8266 note: use pins 3, 4, 5, 12, 13 or 14 --
 // Pin 15 can work but DHT must be disconnected during program upload.
 
 #define DEBUG 1 //set DEBUG macro to 1 to print values to Serial monitor, 0 otherwise
+
+
 
 // Uncomment whatever type you're using!
 //#define DHTTYPE DHT11   // DHT 11
@@ -38,6 +41,7 @@ void setup() {
   #if DEBUG 
       Serial.begin(9600);
       Serial.println(F("DHTxx test!"));
+      pinMode(LEDPIN, OUTPUT);
   #endif
 
   //Begin reading 40-bit stream from AM2302
@@ -65,6 +69,13 @@ void loop() {
 
 //   Compute heat index in Celsius (isFahreheit = false)
   float hic = dht.computeHeatIndex(t, h, false);
+
+  if(t <= 20.00) { //keep heating the space until the sensor reads a value of 20C or higher
+    digitalWrite(RELAYPIN, HIGH); //turns the relay on
+  }
+  else {
+    digitalWrite(RELAYPIN, LOW); //pulls the pin on the relay
+  }
 
   #if DEBUG 
       Serial.print(F("Humidity: "));
