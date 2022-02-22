@@ -41,8 +41,9 @@ void setup() {
   #if DEBUG 
       Serial.begin(9600);
       Serial.println(F("DHTxx test!"));
-      pinMode(LEDPIN, OUTPUT);
   #endif
+
+   pinMode(RELAYPIN, OUTPUT);
 
   //Begin reading 40-bit stream from AM2302
   dht.begin();
