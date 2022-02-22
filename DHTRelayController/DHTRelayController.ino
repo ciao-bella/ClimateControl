@@ -40,7 +40,7 @@ DHT dht(DHTPIN, DHTTYPE);
 void setup() {
   #if DEBUG 
       Serial.begin(9600);
-      Serial.println(F("DHTxx DEBUGGIN!"));
+      Serial.println(F("DHTxx DEBUGGING!"));
   #endif
 
    pinMode(RELAYPIN, OUTPUT);
@@ -72,14 +72,14 @@ void loop() {
   float hic = dht.computeHeatIndex(t, h, false);
 
   if(t <= 20.00) { //keep heating the space until the sensor reads a value of 20C or higher
-    digitalWrite(RELAYPIN, HIGH); //turns the relay on
+    digitalWrite(RELAYPIN, LOW); //allows current through
     #if DEBUG 
       Serial.println("Heater is ON");
     #endif
 
   }
   else {
-    digitalWrite(RELAYPIN, LOW); //pulls the pin on the relay
+    digitalWrite(RELAYPIN, HIGH); //pulls the pin on the relay
     #if DEBUG 
       Serial.println("Heater is OFF");
     #endif
