@@ -7,7 +7,7 @@ This is a project that let's me control the temperature in my home office. I use
  * [Adafruit Unified Sensor Driver](https://github.com/adafruit/Adafruit_Sensor)
 
  # Necessary Drivers
-
+ * For the ESP8266 [CP210x USB to UART Bridge](https://www.silabs.com/developers/usb-to-uart-bridge-vcp-drivers)
 
 # Parent Repository
 https://github.com/adafruit/DHT-sensor-library
