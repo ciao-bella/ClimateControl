@@ -51,7 +51,7 @@ void setup() {
 
 void loop() {
   // Wait a few seconds between measurements.
-  delay(2000);
+  delay(10000);
 
   // Reading temperature or humidity takes about 250 milliseconds!
   // Sensor readings may also be up to 2 seconds 'old' (its a very slow sensor)
@@ -71,19 +71,24 @@ void loop() {
 //   Compute heat index in Celsius (isFahreheit = false)
   float hic = dht.computeHeatIndex(t, h, false);
 
-  if(t <= 20.00) { //keep heating the space until the sensor reads a value of 20C or higher
-    digitalWrite(RELAYPIN, LOW); //allows current through
-    #if DEBUG 
-      Serial.println("Heater is ON");
-    #endif
 
-  }
-  else {
-    digitalWrite(RELAYPIN, HIGH); //pulls the pin on the relay
-    #if DEBUG 
-      Serial.println("Heater is OFF");
-    #endif
-  }
+// We burnt out a relay so we are commenting out this code until we find a safer solution. This is going to be a "read-only" thermostat for a while.
+
+
+//TODO put this logic in its owns function
+//  if(t <= 24.00) { //keep heating the space until the sensor reads a value of 20C or higher
+//    digitalWrite(RELAYPIN, LOW); //allows current through
+//    #if DEBUG 
+//      Serial.println("Heater is ON");
+//    #endif
+//
+//  }
+//  else {
+//    digitalWrite(RELAYPIN, HIGH); //pulls the pin on the relay
+//    #if DEBUG 
+//      Serial.println("Heater is OFF");
+//    #endif
+//  }
 
   #if DEBUG 
       Serial.print(F("Humidity: "));
