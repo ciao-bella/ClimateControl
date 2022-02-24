@@ -6,6 +6,7 @@
 // - Adafruit Unified Sensor Lib: https://github.com/adafruit/Adafruit_Sensor
 
 #include "DHT.h"
+#include <Wire.h>
 
 #define RELAYPIN 8 //control the relay to heating source with this pin
 #define DHTPIN 2     // Digital pin connected to the DHT sensor
