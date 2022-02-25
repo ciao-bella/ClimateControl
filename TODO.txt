@@ -1,0 +1,4 @@
+-add license.txt
+-make struct into a shareable arduino library?
+-add refresh pin to Blynk.io
+-add dependencies list

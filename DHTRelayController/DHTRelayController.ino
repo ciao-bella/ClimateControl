@@ -5,7 +5,7 @@
 // - DHT Sensor Library: https://github.com/adafruit/DHT-sensor-library
 // - Adafruit Unified Sensor Lib: https://github.com/adafruit/Adafruit_Sensor
 
-#include <DHT.h>
+#include <DHT.h> //lets us read the temperature and humidity
 
 // <Wire.h> is a library that allows you to communicate with I2C / TWI devices. We connect the SDA->SDA (serial clock pins)and SCL->SCL (serial data pins).
 // On our Arduino Uno, SDA/SCL pins are just above the AREF pin. https://docs.arduino.cc/learn/communication/wire
@@ -41,18 +41,28 @@
 DHT dht(DHTPIN, DHTTYPE);
 
 
+union ByteChunk { //"type punning" so we can force 3 floats through the wires as a series of bits
+  float   f[3];
+  byte c[12];
+};
+ByteChunk data;
+
 
 void setup() {
   #if DEBUG 
       Serial.begin(9600);
       Serial.println(F("DHTxx DEBUGGING!"));
   #endif
-
-   pinMode(RELAYPIN, OUTPUT);
+  
+//   pinMode(RELAYPIN, OUTPUT);
 
   //Begin reading 40-bit stream from AM2302
   dht.begin();
+  
+  Wire.begin(8);                // join i2c bus with address #8
+  Wire.onRequest(requestEvent); // register event
 }
+
 
 void loop() {
   // Wait a few seconds between measurements.
@@ -61,8 +71,10 @@ void loop() {
   // Reading temperature or humidity takes about 250 milliseconds!
   // Sensor readings may also be up to 2 seconds 'old' (its a very slow sensor)
   float h = dht.readHumidity();
+  data.f[0] = h;
   // Read temperature as Celsius (the default)
   float t = dht.readTemperature();
+  data.f[1] = t;
 
 
   // Check if any reads failed and exit early (to try again).
@@ -75,10 +87,9 @@ void loop() {
 
 //   Compute heat index in Celsius (isFahreheit = false)
   float hic = dht.computeHeatIndex(t, h, false);
-
+  data.f[2] = hic;
 
 // We burnt out a relay so we are commenting out this code until we find a safer solution. This is going to be a "read-only" thermostat for a while.
-
 
 //TODO put this logic in its owns function
 //  if(t <= 24.00) { //keep heating the space until the sensor reads a value of 20C or higher
@@ -106,5 +117,11 @@ void loop() {
       Serial.print(F("°C "));
       Serial.println();
   #endif
+  
+}
 
+// function that executes whenever data is requested by master
+// this function is registered as an event, see setup()
+void requestEvent() { 
+  Wire.write(data.c, sizeof(data)); //I hate this
 }
