@@ -1,29 +1,30 @@
-// <Wire.h> is a library that allows you to communicate with I2C / TWI devices. We connect the SDA->SDA (serial clock pins)and SCL->SCL (serial data pins).
-// On our Arduino Uno, SDA/SCL pins are just above the AREF pin. https://docs.arduino.cc/learn/communication/wire
-// On our NodeMCU ESP8266 board we have pin D2 = SDA and D1 = SCL https://steve.fi/hardware/nodemcu/default-pins/ ; https://www.youtube.com/watch?v=SiU-QZwik8w (1:30 for schematic) ;
-#include <ESP8266WiFi.h>
-#include <BlynkSimpleEsp8266.h>
-#include <Wire.h>
-
 // Template ID, Device Name and Auth Token are provided by the Blynk.Cloud
 // See the Device Info tab, or Template settings
-
-#define BLYNK_TEMPLATE_ID "" //get your template id from Blynk.Console or Blynk.App -> Templates -> Info
-#define BLYNK_DEVICE_NAME "" //get your authentication token from Blynk.Console or Blynk.App -> Devices -> Device Info
-#define BLYNK_AUTH_TOKEN "" //get your authentication token from Blynk.Console or Blynk.App -> Devices -> Device Info
-
-
-// Comment this out to disable prints and save space
-#define BLYNK_PRINT Serial
+#define BLYNK_TEMPLATE_ID "" //these macros must be placed before the inclusion of <ESP8266WiFi.h> and <BlynkSimpleEsp8266.h> as per https://community.blynk.cc/t/invalid-auth-token-issue/54876
+#define BLYNK_DEVICE_NAME ""
+#define BLYNK_AUTH_TOKEN ""
 
 #define DEBUG 1 //set to 0 to save compile space
 
-char auth[] = BLYNK_AUTH_TOKEN;
+#if DEBUG
+  // Comment this out to disable prints and save space
+  #define BLYNK_PRINT Serial
+#endif
 
-// Your WiFi credentials.
-// Set password to "" for open networks.
-char ssid[] = "name of your wifi";
-char pass[] = "your wifi password";
+
+
+
+
+
+#include <ESP8266WiFi.h>
+#include <BlynkSimpleEsp8266.h>
+
+// <Wire.h> is a library that allows you to communicate with I2C / TWI devices. We connect the SDA->SDA (serial clock pins)and SCL->SCL (serial data pins).
+// On our Arduino Uno, SDA/SCL pins are just above the AREF pin. https://docs.arduino.cc/learn/communication/wire
+// On our NodeMCU ESP8266 board we have pin D2 = SDA and D1 = SCL https://steve.fi/hardware/nodemcu/default-pins/ ; https://www.youtube.com/watch?v=SiU-QZwik8w (1:30 for schematic) ;
+#include <Wire.h>
+
+
 
 
 union PunnedFloat //This allows us to practice "type punning" https://en.wikipedia.org/wiki/Type_punning
@@ -35,25 +36,54 @@ union PunnedFloat //This allows us to practice "type punning" https://en.wikiped
         unsigned char c[0];
 };
 
+
+
+
+char auth[] = BLYNK_AUTH_TOKEN;
+
+// Your WiFi credentials.
+// Set password to "" for open networks.
+char ssid[] = "";
+char pass[] = "";
+
+
 PunnedFloat data; 
+BlynkTimer timer; // Creating a timer object
+
+
 
 
 void setup()
 {
   // Debug console  
-  Serial.begin(115200);
+  #if DEBUG
+    Serial.begin(115200);
+    Serial.println("Starting setup...");
+  #endif
   
-//  pinMode(LED_BUILTIN, OUTPUT);     // Initialize the LED_BUILTIN pin as an output
-
   Blynk.begin(auth, ssid, pass);
 
   Wire.begin(D1, D2); // join i2c bus with SDA=D1 and SCL=D2 of NodeMCU
-
+  timer.setInterval(300000L, refreshAndUploadEvent); //Staring a timer that triggers an event every 5 minutes
 }
 
 void loop()
 {
   Blynk.run();
+  timer.run();
+}
+
+void refreshAndUploadEvent()
+{
+  requestTemperatureData();
+  #if DEBUG
+    Serial.println("requesting temperature data...");
+  #endif
+  
+  uploadTemperatureData();
+  #if DEBUG
+    Serial.println("requesting temperature data...");
+  #endif
 }
 
 //Requests temperature data from the Arduino Uno via GPIO
@@ -61,7 +91,7 @@ void loop()
 void requestTemperatureData()
 {
 
-    Wire.requestFrom(8, 12);    // request 12 bytes from peripheral device #8
+    Wire.requestFrom(8, 12);    // request 12 bytes from peripheral device address #8
 
     int i = 0;
     
@@ -75,8 +105,17 @@ void requestTemperatureData()
     
     #if DEBUG
       Serial.println();
-      Serial.println(data.f[0]);
-      Serial.println(data.f[1]);
-      Serial.println(data.f[2]);
+      Serial.println(data.f[0]); //humidity
+      Serial.println(data.f[1]); //temperature
+      Serial.println(data.f[2]); //heat index
     #endif
+}
+
+
+//Uploads the temperature data to Blynk.Cloud via virtual pins
+void uploadTemperatureData()
+{
+  Blynk.virtualWrite(V1, data.f[0]); //humidity
+  Blynk.virtualWrite(V0, data.f[1]); //temperature
+  Blynk.virtualWrite(V2, data.f[2]); //heat index
 }
